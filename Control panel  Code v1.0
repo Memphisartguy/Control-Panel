@@ -1,0 +1,66 @@
+
+int LaserPower = 0;   // Call for full global
+
+// Set Pins Used
+void setup() {
+  pinMode(2, INPUT);  // in from down button
+  pinMode(3, OUTPUT); // out to lasers
+  pinMode(4, INPUT);  // in from up button
+  pinMode(7, OUTPUT); // feedback leds line 1
+  pinMode(8, OUTPUT); // feedback leds line 2
+
+Serial.begin(9600);   // open serial port for debug
+
+// set pins
+  digitalWrite(2, HIGH); // enable fuses
+  digitalWrite(4, HIGH); // enable fuses
+  digitalWrite(7, LOW); // zero LEDS
+  digitalWrite(8, LOW); // zero LEDS
+  
+  analogWrite(3, 0);    // Set PWM to Zero
+}
+
+void loop() // lets get started
+{
+  
+int Down = digitalRead(2); // Read the Down button temp global
+int Up = digitalRead(4);   // Read the Up button temp global
+
+
+if ( Down == 0)  // when down is triggered
+ {
+  digitalWrite(7, HIGH); // light First LEDS +
+  digitalWrite(8, LOW);  // ground the First LED -
+  delay(100);            // Delay so humans can see light
+  digitalWrite(7, LOW);  // Turn off First LED +
+  digitalWrite(8, LOW);  // Not really needed
+  delay(100);            // Delay so humans see the light off
+  
+  if ( LaserPower > 0)   // Check PMW is greater than 0
+  {
+  LaserPower = LaserPower - 10;  // Remove 10 from PWM
+  analogWrite(3, LaserPower);    // Write the new value
+  }
+ }
+ 
+ if ( Up == 0)            // when Up is triggered
+ {
+  digitalWrite(7, LOW);   // ground the Second LED -
+  digitalWrite(8, HIGH);  // light Second LED +
+  delay(100);             // Delay so humans can see light
+  digitalWrite(7, LOW);   // ground the First LED -
+  digitalWrite(8, LOW);   // ground the First LED -
+  delay(100);             // Delay so humans see the light off
+  
+   if ( LaserPower < 250) // Check PMW is less than 250
+  {
+   LaserPower = LaserPower + 10; // Add 10 to PWM
+  analogWrite(3, LaserPower);    // Write the new value
+  }
+ }
+  
+
+Serial.println(LaserPower); //debug using serial monitor
+//Serial.println(Up);       // disabled
+delay(10);                  // debug delay
+}
